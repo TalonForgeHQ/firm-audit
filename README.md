@@ -6,7 +6,7 @@ public receipt that any other protocol can read.
 
 **Hackathon:** Monad Metropolis — Track 4 (Trust, Identity & AI Infrastructure)
 **Network:** Monad testnet (chain id `10143`, RPC `https://testnet-rpc.monad.xyz`)
-**Live UI:** <https://ui-qfn69ht3l-casperzinous-projects.vercel.app>
+**Live UI:** <https://ui-ox64nn7az-casperzinous-projects.vercel.app>
 **Demo video:** <https://youtu.be/3-OGpr3oVxg>
 **Day 8 status:** closed. Contract live, three onchain events, Sourcify
 verified `exact_match`, agent registered in ERC-8004 IdentityRegistry as
