@@ -73,4 +73,19 @@ contract work, no smart accounts, no ENS — the loop on chain already exists.
 
 ## Day 2 — `ui/`
 
-Next.js + viem. Reads only. No wallet, no private key. See [`ui/README.md`](ui/README.md).
+Next.js + viem. Reads only. No wallet, no private key.
+
+```bash
+cd ui
+npm install
+npm run dev
+```
+
+Open http://localhost:3000 (or 3001/3002/... if 3000 is busy — Next picks the
+next free port).
+
+The page renders every `DecisionProposed` log emitted by the contract in the
+last ~5000 blocks, with one card per pending decision. Click **Approve**,
+**Reject**, or **Execute** to reveal the exact `cast` command to run from
+your shell. Signing happens there, where the key lives. Screenshot:
+`ui-demo.png`. See [`ui/README.md`](ui/README.md).
