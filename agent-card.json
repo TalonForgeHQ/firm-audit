@@ -11,8 +11,18 @@
   },
   "registry": {
     "erc8004": {
-      "status": "not_registered",
-      "note": "Day 5 deliverable is the card only; ERC-8004 IdentityRegistry registration on Monad testnet deferred — registry address for chain 10143 not confirmed in vendor docs at build time."
+      "status": "registered",
+      "chainId": 10143,
+      "registryAddress": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+      "agentId": 1825,
+      "owner": "0xc5cD2152C1A6B016aB9af9B5b3733Af62eB47cF8",
+      "agentURI": "https://raw.githubusercontent.com/TalonForgeHQ/firm-audit/main/agent-card.json",
+      "registerTx": "0x10c8935fcfcb62f5d7beaaddf805115e8c21878f20454f89c67f96b4a7713aa4",
+      "registeredAt": "2026-09-07",
+      "reputation": {
+        "status": "not_submitted",
+        "note": "Day 7 deferral: reputation registry interaction skipped per scope (no other features this turn)."
+      }
     }
   }
 }

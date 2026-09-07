@@ -6,7 +6,9 @@ public receipt that any other protocol can read.
 
 **Hackathon:** Monad Metropolis — Track 4 (Trust, Identity & AI Infrastructure)
 **Network:** Monad testnet (chain id `10143`, RPC `https://testnet-rpc.monad.xyz`)
-**Day 1 status:** closed. Three onchain events landed on one contract page.
+**Day 7 status:** closed. Contract live, three onchain events, Sourcify
+verified `exact_match`, agent registered in ERC-8004 IdentityRegistry as
+**agentId 1825**.
 
 ## What FirmAudit is
 
@@ -64,12 +66,6 @@ Screenshot of the Events tab: `demo-events.png`.
 **Do not commit `.env`.** It holds the deployer private key.
 `.gitignore` already excludes it, along with `out/`, `cache/`, `broadcast/`,
 `lib/`. Verify with `git status` before every push.
-
-## Next build (Day 2, not tonight)
-
-One-page approve screen. Polls the contract for `DecisionProposed`, shows
-Approve / Reject buttons, fires `scripts/execute.sh` on approve. No new
-contract work, no smart accounts, no ENS — the loop on chain already exists.
 
 ## Day 2 — `ui/`
 
@@ -143,7 +139,41 @@ Hermes on the propose side instead of a human running `scripts/propose.sh`.
     --compiler-version 0.8.36 --num-of-optimizations 200
   ```
 
-  No contract changes. ERC-8004 IdentityRegistry registration on chain 10143
-  is deferred — no public registry address for Monad testnet was confirmed in
-  vendor docs at build time. The agent card is ready; registering is a
-  one-line call when the address is known.
+  No contract changes. ERC-8004 registration on chain 10143 was deferred at
+  Day 5 because the docs address `0x8004A169…432` was unverified for
+  testnet — see Day 7 below for the resolution.
+
+## Day 7 — ERC-8004 IdentityRegistry registration
+
+Talon is now registered in the ERC-8004 IdentityRegistry on Monad testnet
+(chain 10143):
+
+- **Registry:** [`0x8004A818BFB912233c491871b3d84c89A494BD9e`](https://testnet.monadvision.com/address/0x8004A818BFB912233c491871b3d84c89A494BD9e)
+- **agentId:** `1825`
+- **Owner:** `0xc5cD2152C1A6B016aB9af9B5b3733Af62eB47cF8`
+- **agentURI:** `https://raw.githubusercontent.com/TalonForgeHQ/firm-audit/main/agent-card.json`
+- **Register tx:** [`0x10c8935fcfcb62f5d7beaaddf805115e8c21878f20454f89c67f96b4a7713aa4`](https://testnet.monadvision.com/tx/0x10c8935fcfcb62f5d7beaaddf805115e8c21878f20454f89c67f96b4a7713aa4)
+
+The agent card at the URI is the same JSON in `agent-card.json` at the repo
+root — `name`, `role`, `address`, `chainId`, `contract`, `abilities`,
+`endpoints`. ERC-721 `Transfer(0x0 → 0xc5cD…, 1825)` confirms the mint;
+`ownerOf(1825)` and `tokenURI(1825)` re-reads return the agent EOA and the
+agentURI string respectively.
+
+The onchain call:
+
+```bash
+cast send 0x8004A818BFB912233c491871b3d84c89A494BD9e \
+  "register(string)" \
+  "https://raw.githubusercontent.com/TalonForgeHQ/firm-audit/main/agent-card.json" \
+  --rpc-url "$RPC" --private-key "$PRIVATE_KEY"
+```
+
+No ETH value required — `register()` is non-payable. ReputationRegistry
+interaction is deferred per scope. **No other features this turn.**
+
+> Note: the Monad docs page lists the IdentityRegistry address as
+> `0x8004A169…432` (monadvision.com auto-resolves to **mainnet**). On
+> **testnet** (chain 10143) that address has no deployed code. The
+> working testnet address `0x8004A818…BD9e` was provided directly and is
+> what we registered against.
