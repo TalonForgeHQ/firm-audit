@@ -1,0 +1,72 @@
+# FirmAudit
+
+A persistent multi-agent firm with an onchain identity on Monad.
+Every agent decision, every human approval, and every onchain execution is a
+public receipt that any other protocol can read.
+
+**Hackathon:** Monad Metropolis — Track 4 (Trust, Identity & AI Infrastructure)
+**Network:** Monad testnet (chain id `10143`, RPC `https://testnet-rpc.monad.xyz`)
+**Day 1 status:** closed. Three onchain events landed on one contract page.
+
+## What FirmAudit is
+
+A minimal write-only log with three events:
+
+| Event              | Emitted by       | When                                            |
+|--------------------|------------------|-------------------------------------------------|
+| `DecisionProposed` | an agent EOA     | the agent proposes a decision keyed by `digest` |
+| `ApprovalRecorded` | an approver EOA  | the approver approves (decision=1) or rejects   |
+| `ActionExecuted`   | an agent EOA     | the agent posts the onchain tx hash that ran    |
+
+The contract enforces the order (`proposed` → `approved` → `recordExecution`)
+and the membership (`isAgent`, `isApprover`). It does NOT custody funds and
+does NOT send the transfer — the human-approval safety property lives in
+`scripts/execute.sh`, which refuses to broadcast the MON transfer unless
+`approved[digest]` reads `true` on chain.
+
+## The three commands
+
+From `~/projects/firm-audit`, after `.env` is filled in:
+
+```bash
+source .env
+DIGEST=$(cast keccak "demo-pay-50")
+
+bash scripts/propose.sh    # DecisionProposed
+bash scripts/approve.sh    # ApprovalRecorded
+bash scripts/execute.sh    # 0.001 MON transfer + ActionExecuted
+```
+
+Each script wraps a single `cast send` (or `cast call` + `cast send` for
+execute) against the contract at `$CONTRACT`.
+
+## Day 1 receipts (Monad testnet)
+
+**Contract:** `0x0ae52722d5180Cc99F205958A4a042cC3cD557BB`
+Contract page (Events tab shows all three rows):
+<https://testnet.monadvision.com/address/0x0ae52722d5180Cc99F205958A4a042cC3cD557BB>
+
+| Step                  | Tx hash                                                              |
+|-----------------------|----------------------------------------------------------------------|
+| Deploy                | `0xd0fa7bb49dd35dd2722a5351965f9ee66a5d6ba5506e595777bf2735c3de63f4` |
+| `DecisionProposed`    | `0xf6d0e55c732146014f10de2e45b1e3aab72f65b48c1684d22d80a6de396de0cf` |
+| `ApprovalRecorded`    | `0x094e68b40869e251b4147208535537d5643e013cb46f9101224cfd9d1d435ba0` |
+| `ActionExecuted`      | `0x9458e5a924419c91ebb22112e9e6b8d6097400c0137e2b9c870341e982bfee40` |
+| MON transfer (PAY)    | `0x0901edac1c558f0e17a5aae935aa7a8cfb3c40af0b3b6cf48f05887a25c2f657` |
+
+`ActionExecuted.data` carries the PAY tx hash, so the explorer links the
+"we said we'd do it" event to the "we actually did it" tx.
+
+Screenshot of the Events tab: `demo-events.png`.
+
+## Repo hygiene
+
+**Do not commit `.env`.** It holds the deployer private key.
+`.gitignore` already excludes it, along with `out/`, `cache/`, `broadcast/`,
+`lib/`. Verify with `git status` before every push.
+
+## Next build (Day 2, not tonight)
+
+One-page approve screen. Polls the contract for `DecisionProposed`, shows
+Approve / Reject buttons, fires `scripts/execute.sh` on approve. No new
+contract work, no smart accounts, no ENS — the loop on chain already exists.
