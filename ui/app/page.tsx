@@ -21,6 +21,7 @@ const APPROVED_ABI = [{
 export default async function Page() {
   const rpc = process.env.NEXT_PUBLIC_RPC;
   const contract = process.env.NEXT_PUBLIC_CONTRACT as `0x${string}` | undefined;
+  const agentId = process.env.NEXT_PUBLIC_AGENT_ID;
   if (!rpc || !contract) {
     return (
       <main className="container">
@@ -53,5 +54,5 @@ export default async function Page() {
       address: contract, abi: APPROVED_ABI, functionName: 'approved', args: [log.args.digest!],
     }) as boolean,
   })));
-  return <PendingList items={items} contract={contract} rpc={rpc} />;
+  return <PendingList items={items} contract={contract} rpc={rpc} agentId={agentId} />;
 }

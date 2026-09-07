@@ -13,7 +13,7 @@ type Item = {
 const trunc = (s: string, head = 6, tail = 4) =>
   s.length > head + tail + 2 ? `${s.slice(0, head)}…${s.slice(-tail)}` : s;
 
-export default function PendingList({ items, contract, rpc }: { items: Item[]; contract: string; rpc: string }) {
+export default function PendingList({ items, contract, rpc, agentId }: { items: Item[]; contract: string; rpc: string; agentId?: string }) {
   const [open, setOpen] = useState<string | null>(null);
   const castSend = (fn: string, args: string) =>
     `cast send ${contract} "${fn}" ${args} \\\n  --rpc-url ${rpc} \\\n  --private-key $PRIVATE_KEY`;
@@ -33,6 +33,7 @@ export default function PendingList({ items, contract, rpc }: { items: Item[]; c
         <div className="meta">
           <span><strong>Contract</strong> {trunc(contract, 8, 6)}</span>
           <span><strong>Events</strong> {items.length} found</span>
+          {agentId && <span><strong>ERC-8004</strong> agent #{agentId}</span>}
           <span><strong>Explorer</strong> <a href={explorer} target="_blank" rel="noreferrer">testnet.monadvision.com</a></span>
         </div>
       </header>
