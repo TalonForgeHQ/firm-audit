@@ -70,3 +70,7 @@ Screenshot of the Events tab: `demo-events.png`.
 One-page approve screen. Polls the contract for `DecisionProposed`, shows
 Approve / Reject buttons, fires `scripts/execute.sh` on approve. No new
 contract work, no smart accounts, no ENS — the loop on chain already exists.
+
+## Day 2 — `ui/`
+
+Next.js + viem. Reads only. No wallet, no private key. See [`ui/README.md`](ui/README.md).
