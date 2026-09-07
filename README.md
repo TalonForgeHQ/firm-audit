@@ -6,9 +6,10 @@ public receipt that any other protocol can read.
 
 **Hackathon:** Monad Metropolis — Track 4 (Trust, Identity & AI Infrastructure)
 **Network:** Monad testnet (chain id `10143`, RPC `https://testnet-rpc.monad.xyz`)
-**Day 7 status:** closed. Contract live, three onchain events, Sourcify
+**Live UI:** <https://ui-qfn69ht3l-casperzinous-projects.vercel.app>
+**Day 8 status:** closed. Contract live, three onchain events, Sourcify
 verified `exact_match`, agent registered in ERC-8004 IdentityRegistry as
-**agentId 1825**.
+**agentId 1825**, public Vercel deployment reachable without login.
 
 ## What FirmAudit is
 
