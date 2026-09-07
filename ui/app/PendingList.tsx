@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { formatUnits } from 'viem';
+import ApproveButtons from './ApproveButtons';
 
 type Item = {
   digest: `0x${string}`;
@@ -13,10 +14,8 @@ type Item = {
 const trunc = (s: string, head = 6, tail = 4) =>
   s.length > head + tail + 2 ? `${s.slice(0, head)}…${s.slice(-tail)}` : s;
 
-export default function PendingList({ items, contract, rpc, agentId }: { items: Item[]; contract: string; rpc: string; agentId?: string }) {
+export default function PendingList({ items, contract, rpc, agentId }: { items: Item[]; contract: `0x${string}`; rpc: string; agentId?: string }) {
   const [open, setOpen] = useState<string | null>(null);
-  const castSend = (fn: string, args: string) =>
-    `cast send ${contract} "${fn}" ${args} \\\n  --rpc-url ${rpc} \\\n  --private-key $PRIVATE_KEY`;
   const explorer = `https://testnet.monadvision.com/address/${contract}`;
   return (
     <main className="container">
@@ -25,7 +24,7 @@ export default function PendingList({ items, contract, rpc, agentId }: { items: 
           <div className="dot" aria-hidden />
           <div>
             <div className="brand-name">FirmAudit</div>
-            <div className="brand-tag">Monad Testnet · chain 10143</div>
+            <div className="brand-tag">Talon · ERC-8004 #{agentId ?? '—'} · chain 10143</div>
           </div>
         </div>
         <h1>Onchain decisions,<br />approved by humans.</h1>
@@ -33,7 +32,6 @@ export default function PendingList({ items, contract, rpc, agentId }: { items: 
         <div className="meta">
           <span><strong>Contract</strong> {trunc(contract, 8, 6)}</span>
           <span><strong>Events</strong> {items.length} found</span>
-          {agentId && <span><strong>ERC-8004</strong> agent #{agentId}</span>}
           <span><strong>Explorer</strong> <a href={explorer} target="_blank" rel="noreferrer">testnet.monadvision.com</a></span>
         </div>
       </header>
@@ -49,9 +47,8 @@ export default function PendingList({ items, contract, rpc, agentId }: { items: 
       )}
 
       {items.map((it) => {
-        const tag = (k: string) => it.digest + ':' + k;
-        const isOpen = (k: string) => open === tag(k);
-        const toggle = (k: string) => setOpen(isOpen(k) ? null : tag(k));
+        const isOpen = (k: string) => open === it.digest + ':' + k;
+        const toggle = (k: string) => setOpen(isOpen(k) ? null : it.digest + ':' + k);
         const amount = formatUnits(it.amount, 18);
         return (
           <article key={it.digest} className="card">
@@ -69,23 +66,10 @@ export default function PendingList({ items, contract, rpc, agentId }: { items: 
               <div className="field-label">Amount</div>
               <div className="field-value mono-strong">{amount} MON</div>
             </div>
+            {!it.approved && <ApproveButtons digest={it.digest} contract={contract} rpc={rpc} />}
             <div className="actions">
-              <button className="btn approve" onClick={() => toggle('a')}>Approve</button>
-              <button className="btn reject" onClick={() => toggle('r')}>Reject</button>
-              <button className="btn execute" disabled={!it.approved} onClick={() => toggle('x')}>Execute</button>
+              <button className="btn execute" disabled={!it.approved} onClick={() => toggle('x')}>Execute (script)</button>
             </div>
-            {isOpen('a') && (
-              <div className="command">
-                <div className="command-label">Run in your shell · recordApproval(digest, 1)</div>
-                {castSend('recordApproval(bytes32,uint8)', `${it.digest} 1`)}
-              </div>
-            )}
-            {isOpen('r') && (
-              <div className="command">
-                <div className="command-label">Run in your shell · recordApproval(digest, 0)</div>
-                {castSend('recordApproval(bytes32,uint8)', `${it.digest} 0`)}
-              </div>
-            )}
             {isOpen('x') && (
               <div className="command">
                 <div className="command-label">Run in your shell · script verifies approved[digest], sends MON, records execution</div>
@@ -97,7 +81,7 @@ export default function PendingList({ items, contract, rpc, agentId }: { items: 
       })}
 
       <footer className="footer">
-        <span>Read-only. No wallet. No signing in the browser.</span>
+        <span>Read-only by default. Connect MetaMask to sign Approve / Reject. Execute stays a script.</span>
         <span><a href="https://github.com/TalonForgeHQ/firm-audit" target="_blank" rel="noreferrer">github.com/TalonForgeHQ/firm-audit</a></span>
       </footer>
     </main>

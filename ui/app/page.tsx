@@ -17,6 +17,8 @@ const APPROVED_ABI = [{
   type: 'function', name: 'approved', stateMutability: 'view',
   inputs: [{ name: '', type: 'bytes32' }], outputs: [{ name: '', type: 'bool' }],
 }] as const;
+type DecisionLog = Awaited<ReturnType<ReturnType<typeof createPublicClient>['getLogs']>>;
+type DecisionLogItem = DecisionLog[number];
 
 export default async function Page() {
   const rpc = process.env.NEXT_PUBLIC_RPC;
@@ -42,10 +44,19 @@ export default async function Page() {
     ranges.push({ fromBlock: start, toBlock: end });
     end = start - 1n;
   }
-  const allLogs = (await Promise.all(ranges.map((r) =>
-    client.getLogs({ address: contract, event: EVENT_DECISION, fromBlock: r.fromBlock, toBlock: r.toBlock }),
-  ))).flat();
-  const items = await Promise.all(allLogs.map(async (log) => ({
+  const allLogs: DecisionLog = [];
+  for (const r of ranges) {
+    const fetchChunk = () => client.getLogs({ address: contract, event: EVENT_DECISION, fromBlock: r.fromBlock, toBlock: r.toBlock });
+    try {
+      allLogs.push(...(await fetchChunk()) as DecisionLog);
+    } catch (e: any) {
+      if (e?.status === 429 || e?.details?.includes?.('limited')) {
+        await new Promise((res) => setTimeout(res, 1500));
+        allLogs.push(...(await fetchChunk()) as DecisionLog);
+      } else { throw e; }
+    }
+  }
+  const items = await Promise.all((allLogs as DecisionLogItem[]).map(async (log: any) => ({
     digest: log.args.digest!,
     agent: log.args.agent!,
     target: log.args.target!,
