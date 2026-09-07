@@ -89,3 +89,20 @@ last ~5000 blocks, with one card per pending decision. Click **Approve**,
 **Reject**, or **Execute** to reveal the exact `cast` command to run from
 your shell. Signing happens there, where the key lives. Screenshot:
 `ui-demo.png`. See [`ui/README.md`](ui/README.md).
+
+## Day 3 — Hermes propose
+
+Hermes (this orchestrator) is now an agent of the firm. Instead of a human
+running `scripts/propose.sh` with a hardcoded digest, Hermes builds a fresh
+unique digest (`hermes-pay-<unix-nanos>-<rand>`) and calls `propose()`
+directly. Run it from anywhere in the repo:
+
+```bash
+bash scripts/hermes-propose.sh
+```
+
+Prints `DIGEST=` and `PROPOSE_TX=` on success. Retries once on revert (the
+only realistic cause is a digest collision; the new digest includes
+nanoseconds + a random suffix, so collisions are not expected in practice).
+The contract, agent, approver, and amount are unchanged from Day 1 — this
+is just a new caller for `propose()`.
