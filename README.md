@@ -121,3 +121,29 @@ the agent's "we said we'd do it" event to the "we actually did it" tx.
 Confirmed onchain: `proposed[digest] = true`, `approved[digest] = true`.
 No contract changes — the same `propose → recordApproval → execute` loop, with
 Hermes on the propose side instead of a human running `scripts/propose.sh`.
+
+## Day 5 — Identity + demo
+
+- **`agent-card.json`** at the repo root — ERC-8004-style card for the agent
+  wallet. `name=Talon`, `role=agent`, `address`, `chainId`, `contract`,
+  `abilities: [propose]`, `endpoints.github` = this repo.
+- **`DEMO.md`** — 3-minute video script. UI idle → `hermes-propose.sh` → UI
+  refresh → `approve.sh` → `execute.sh` → explorer Logs (one page, three
+  events). Captions only; no narration.
+- **Sourcify verification:** the contract is verified on Sourcify against
+  Monad testnet (chain 10143) as `exact_match` for both creation and runtime.
+  Proof: <https://sourcify.dev/contracts/10143/0x0ae52722d5180Cc99F205958A4a042cC3cD557BB>
+  (also dumped to `sourcify-proof.json`). Reproduce with:
+
+  ```bash
+  forge verify-contract 0x0ae52722d5180Cc99F205958A4a042cC3cD557BB \
+    src/FirmAudit.sol:FirmAudit \
+    --verifier sourcify --chain 10143 \
+    --creation-transaction-hash 0xd0fa7bb49dd35dd2722a5351965f9ee66a5d6ba5506e595777bf2735c3de63f4 \
+    --compiler-version 0.8.36 --num-of-optimizations 200
+  ```
+
+  No contract changes. ERC-8004 IdentityRegistry registration on chain 10143
+  is deferred — no public registry address for Monad testnet was confirmed in
+  vendor docs at build time. The agent card is ready; registering is a
+  one-line call when the address is known.

@@ -1,0 +1,18 @@
+{
+  "name": "Talon",
+  "role": "agent",
+  "description": "Orchestrator agent of Talon Forge LLC. The onchain identity that proposes firm decisions and records their execution.",
+  "address": "0xc5cD2152C1A6B016aB9af9B5b3733Af62eB47cF8",
+  "chainId": 10143,
+  "contract": "0x0ae52722d5180Cc99F205958A4a042cC3cD557BB",
+  "abilities": ["propose"],
+  "endpoints": {
+    "github": "https://github.com/TalonForgeHQ/firm-audit"
+  },
+  "registry": {
+    "erc8004": {
+      "status": "not_registered",
+      "note": "Day 5 deliverable is the card only; ERC-8004 IdentityRegistry registration on Monad testnet deferred — registry address for chain 10143 not confirmed in vendor docs at build time."
+    }
+  }
+}
