@@ -177,3 +177,27 @@ interaction is deferred per scope. **No other features this turn.**
 > **testnet** (chain 10143) that address has no deployed code. The
 > working testnet address `0x8004A818…BD9e` was provided directly and is
 > what we registered against.
+
+## Day 8 — First MetaMask approve + close the loop end-to-end
+
+Hermes proposed digest `0x42c5f121…de33611` via `scripts/hermes-propose.sh`.
+Zinou approved it from the UI through MetaMask (no private key in the
+browser):
+
+- Approve tx: [`0x30a6aad8…21fa2`](https://testnet.monadvision.com/tx/0x30a6aad8c21fa2)
+
+The UI card flipped from `PENDING` to `APPROVED` on next refresh. Then
+`scripts/execute.sh` ran with `DIGEST=0x42c5f121…de33611`:
+
+- MON transfer (PAY): [`0x186c4dcc…add41`](https://testnet.monadvision.com/tx/0x186c4dcc2cd1d746940f8515cae228b7acf13a71d5c7e2f13f1b0c68be1add41)
+- recordExecution: [`0xebbdaeca…c997`](https://testnet.monadvision.com/tx/0xebbdaeca3fa2a882478719c61d660705ee49502a8d103957fe6efb7736d8c997)
+
+`ActionExecuted.data` carries the PAY tx hash. This is the same three-event
+loop as Day 1, but the **approve** is now signed by MetaMask through wagmi
+in the browser, not by `cast send` in a shell. The contract, scripts,
+.env, and agent EOA are unchanged.
+
+Screenshots:
+- `metamask-day-8-tx-request.png` — MetaMask transaction request for `recordApproval`
+- `metamask-day-8-tx-confirmed.png` — UI showing `Sent ✓ tx 0x30a6aad8…` + "Confirmed" Brave toast
+- `metamask-day-8-approved.png` — UI card after refresh, badge = `APPROVED`
