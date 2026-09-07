@@ -106,3 +106,18 @@ only realistic cause is a digest collision; the new digest includes
 nanoseconds + a random suffix, so collisions are not expected in practice).
 The contract, agent, approver, and amount are unchanged from Day 1 — this
 is just a new caller for `propose()`.
+
+## Day 4 — Closing the loop
+
+Day 3's first Hermes proposal (`digest 0x3eb3967d…ce825`) was approved and
+executed end-to-end:
+
+- Approve: [`0xa0211c60…218ba`](https://testnet.monadvision.com/tx/0xa0211c6015914e246112bc187e1877c7986a577fc3431e03ec0c19e98a9218ba)
+- MON transfer (PAY): [`0xd3bb3e34…2cc6f`](https://testnet.monadvision.com/tx/0xd3bb3e34641f59cb66bc8504a991cdd893b6aa6ad97b5a1326d160309712cc6f)
+- recordExecution: [`0x8f576cec…2ef1a`](https://testnet.monadvision.com/tx/0x8f576cec140945a8ccf5f69401347f1e0733b2d159987499e9cea9f1a592ef1a)
+
+`ActionExecuted.data` carries the PAY tx hash, so the onchain receipt links
+the agent's "we said we'd do it" event to the "we actually did it" tx.
+Confirmed onchain: `proposed[digest] = true`, `approved[digest] = true`.
+No contract changes — the same `propose → recordApproval → execute` loop, with
+Hermes on the propose side instead of a human running `scripts/propose.sh`.
